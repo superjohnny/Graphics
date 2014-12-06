@@ -22,53 +22,57 @@ while [ 1 ]; do
 #btcurrent=$(echo $cmdout | grep -c "1 sent") 2> /dev/null
 
 #echo $btcurrent
-#i2cset -y 1 0x26 0
+#i2cset -y 1 0x26 4
 
 #if [ $btcurrent = $connected ]; then
 #    i2cset -y 1 0x26 1
 #fi
 #sleep 1
 
-#i2cset -y 1 0x26 0
+#i2cset -y 1 0x26 4
 
 #turn on red
 i2cset -y 1 0x26 3
 
 #listen for device
-$changed=0
+changed=0
 cmdout=$(l2ping $device -c 1)
 btcurrent=$(echo $cmdout | grep -c "1 sent") 2> /dev/null
 
 #clear all
-i2cset -y 1 0x26 0
+i2cset -y 1 0x26 4
 
 #get the connection state
-$newstate=0
+newstate=0
 if [ $btcurrent = $connected ]; then
-    $newstate=1
+    newstate=1
 fi
 
 #has the state changed
 if [ $state -ne $newstate ]; then
-    $state=$newstate
-    $counter=0
+    echo "state changed"
+    state=$newstate
+    counter=0
 
     if [ $state = 1 ]; then
-        $counter=10
+        counter=10
+        echo "setting counter = 10"
     fi
 
-    $changed=1
+    changed=1
 fi
 
 if [ $counter -gt 0 ]; then
+    echo "decrement counter"
     ((counter--))
     if [ $counter = 0 ]; then
-        $changed=1
+        changed=1
     fi
 fi
 
 if [ $changed = 1 ]; then
-    $changed=0
+    echo "the state needs to change"
+    changed=0
 
     if [ $counter -gt 0 ]; then
         i2cset -y 1 0x26 1

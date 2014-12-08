@@ -21,7 +21,7 @@ while [ 1 ]; do
 #cmdout=$(l2ping $device -c 1)
 #btcurrent=$(echo $cmdout | grep -c "1 sent") 2> /dev/null
 
-#echo $btcurrent
+#echo "btcurrent $btcurrent"
 #i2cset -y 1 0x26 4
 
 #if [ $btcurrent = $connected ]; then
@@ -32,14 +32,17 @@ while [ 1 ]; do
 #i2cset -y 1 0x26 4
 
 #turn on red
+echo 0
 i2cset -y 1 0x26 3
 
 #listen for device
 changed=0
 cmdout=$(l2ping $device -c 1)
+
 btcurrent=$(echo $cmdout | grep -c "1 sent") 2> /dev/null
 
 #clear all
+echo 1
 i2cset -y 1 0x26 4
 
 #get the connection state
@@ -50,40 +53,45 @@ fi
 
 #has the state changed
 if [ $state -ne $newstate ]; then
-    echo "state changed"
     state=$newstate
     counter=0
 
     if [ $state = 1 ]; then
         counter=10
-        echo "setting counter = 10"
     fi
 
     changed=1
 fi
 
+echo "state = $state    counter =  $counter    current = $btcurrent"
+
 if [ $counter -gt 0 ]; then
-    echo "decrement counter"
     ((counter--))
     if [ $counter = 0 ]; then
         changed=1
     fi
 fi
 
+if [ $state = 0 ]; then
+    echo 3
+    i2cset -y 1 0x26 0
+fi
+
 if [ $changed = 1 ]; then
-    echo "the state needs to change"
     changed=0
 
     if [ $counter -gt 0 ]; then
+        echo 4
         i2cset -y 1 0x26 1
     fi
 
     if [ $counter = 0 ]; then
+        echo 5
         i2cset -y 1 0x26 0
     fi
 fi
 
-sleep 5
+sleep 2
 
 #rssi=$(echo $cmdout | sed -e 's/RSSI return value: //g')
 

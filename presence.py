@@ -61,6 +61,10 @@ def ReadDummy():
     return delta.seconds > 5 and delta.seconds < 30
 
 
+# Or's the elements of an array together
+def OrElements(seq):
+    def OrPair(x,y): return x or y
+    return reduce(OrPair, seq, 0)
 
 
 #init

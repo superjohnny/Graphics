@@ -68,8 +68,10 @@ def OrElements(seq):
 
 
 #init
-secondsBetweenScans = 1
-secondsDurationOn = 10
+fastScans = 1
+slowScans = 30
+secondsBetweenScans = fastScans
+secondsDurationOn = 240
 timestamp = datetime.now()
 deviceids = ["C0:63:94:4E:62:F3", "C0:63:94:4E:62:F1"]
 state = False
@@ -99,8 +101,10 @@ while True:
     if state:
         delta = datetime.now() - timestamp
         Lights(delta.seconds < secondsDurationOn)
+        secondsBetweenScans = slowScans
     else:
         Lights(False)
+        secondsBetweenScans = fastScans
 
     sleep(secondsBetweenScans)
 

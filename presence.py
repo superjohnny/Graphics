@@ -71,7 +71,7 @@ def OrElements(seq):
 secondsBetweenScans = 1
 secondsDurationOn = 10
 timestamp = datetime.now()
-deviceid = "C0:63:94:4E:62:F3"
+deviceids = ["C0:63:94:4E:62:F3", "C0:63:94:4E:62:F1"]
 state = False
 _on = False
 
@@ -80,7 +80,16 @@ _on = False
 #loop
 while True:
     #    newState = ReadBluetooth(deviceid)
-    newState = ReadDummy()
+    #newState = ReadDummy()
+    #scan for devices
+    for device in deviceids:
+        newState = False
+        deviceState = ReadBluetooth(device)
+        if deviceState:
+            # if any device found, set for True
+            newState = True
+            break
+        
     
     #has it changed
     if state != newState:

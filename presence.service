@@ -1,9 +1,11 @@
 
 [Unit]
 Description=Bluetooth Presence
+After=syslog.target network.target
 
 [Service]
-ExecStart=python2 /root/graphics/presence.py
+ExecStart=/usr/bin/python2 /root/graphics/presence.py
+Restart=on-abort
 
 [Install]
 WantedBy=multi-user.target

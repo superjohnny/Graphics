@@ -1,5 +1,5 @@
 
-#!/usr/bin/python
+#!/usr/bin/env python2
 
 import sys
 import datetime
@@ -17,9 +17,9 @@ def Lights(on):
         print "changed " + str(_on)
         #write to device
         if _on:
-            WriteToDevice(1)
+            WriteToDevice(1,0)
         else:
-            WriteToDevice(2)
+            WriteToDevice(2,0)
     
 #    print "not changed " + str(_on)
     return _on
@@ -27,14 +27,18 @@ def Lights(on):
 
 # writes value to i2c command line
 # 0 turns all off. 1 turns on green. 2 turns off green. 3 turns on red. 4 turns off red.
-def WriteToDevice(value):
+def WriteToDevice(value, retry):
     
+    if retry > 3:
+        return
+
     try:
         subprocess.check_call("i2cset -y 1 0x26 " + str(value), shell=True)
 
     except:
         print "Error writing to device " + str(value)
-
+	WriteToDevice(value, retry + 1)
+	
     return
 
 # detects bluetooth presence of device with id
@@ -78,10 +82,10 @@ state = False
 _on = False
 
 
-WriteToDevice(1)
-WriteToDevice(0)
-WriteToDevice(3)
-WriteToDevice(0)
+WriteToDevice(1,0)
+WriteToDevice(0,0)
+WriteToDevice(3,0)
+WriteToDevice(0,0)
 
 #loop
 while True:

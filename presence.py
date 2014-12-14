@@ -10,23 +10,22 @@ from datetime import datetime
 from datetime import timedelta
 
 
-
-
-
-
 def Lights(on):
     global _on
     if _on != on:
         _on = on
         print "changed " + str(_on)
         #write to device
-
+        if _on:
+            WriteToDevice(1)
+        else:
+            WriteToDevice(2)
     
 #    print "not changed " + str(_on)
     return _on
 
 
-#writes value to i2c command line
+# writes value to i2c command line
 # 0 turns all off. 1 turns on green. 2 turns off green. 3 turns on red. 4 turns off red.
 def WriteToDevice(value):
     
@@ -34,7 +33,7 @@ def WriteToDevice(value):
         subprocess.check_call("i2cset -y 1 0x26 " + str(value), shell=True)
 
     except:
-        print "Error writing to device"
+        print "Error writing to device " + str(value)
 
     return
 
@@ -43,7 +42,7 @@ def ReadBluetooth(deviceid):
     response = False
     
     try:
-        subprocess.check_output("l2ping " + deviceid + " -c 1 | grep -c '1 sent' 2> /dev/null", stderr=subprocess.STDOUT, shell=True)
+        subprocess.check_output("l2ping " + deviceid + " -c 2 | grep -c 'sent' 2> /dev/null", stderr=subprocess.STDOUT, shell=True)
         response = True
     
     except:
@@ -68,31 +67,39 @@ def OrElements(seq):
 
 
 #init
-fastScans = 1
-slowScans = 30
+fastScans = 3
+slowScans = 15
 secondsBetweenScans = fastScans
-secondsDurationOn = 240
+secondsDurationOn = 250
 timestamp = datetime.now()
-deviceids = ["C0:63:94:4E:62:F3", "C0:63:94:4E:62:F1"]
+#deviceids = ["C0:63:94:4E:62:F3", "C0:63:94:4E:62:F1"]
+deviceids = ["CD:63:94:4E:62:F3"]
 state = False
 _on = False
 
 
+WriteToDevice(1)
+WriteToDevice(0)
+WriteToDevice(3)
+WriteToDevice(0)
 
 #loop
 while True:
     #    newState = ReadBluetooth(deviceid)
     #newState = ReadDummy()
+
     #scan for devices
     for device in deviceids:
+        print "scanning for " + device
         newState = False
         deviceState = ReadBluetooth(device)
         if deviceState:
             # if any device found, set for True
+            print "found " + device		
             newState = True
             break
-        
-    
+
+
     #has it changed
     if state != newState:
         state = newState
@@ -106,6 +113,7 @@ while True:
         Lights(False)
         secondsBetweenScans = fastScans
 
+    print "sleeping for " + str(secondsBetweenScans)
     sleep(secondsBetweenScans)
 
 

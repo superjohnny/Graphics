@@ -1,0 +1,11 @@
+
+[Unit]
+Description=Bluetooth Presence
+
+[Service]
+ExecStart=python2 /root/graphics/presence.py
+
+[Install]
+WantedBy=multi-user.target
+
+

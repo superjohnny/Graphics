@@ -94,6 +94,7 @@ while True:
 
     #scan for devices
     for device in deviceids:
+        WriteToDevice(3,0)
         print "scanning for " + device
         newState = False
         deviceState = ReadBluetooth(device)
@@ -103,6 +104,7 @@ while True:
             newState = True
             break
 
+    WriteToDevice(4,0)
 
     #has it changed
     if state != newState:

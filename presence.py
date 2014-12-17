@@ -9,6 +9,17 @@ from time import sleep
 from datetime import datetime
 from datetime import timedelta
 
+class Device:
+    id = "123"
+    timestamp = datetime.now() - timedelta(0,10000)
+    
+    def __init__(self, id):
+        self.id = id
+    
+    def SecondsSince(self):
+        delta = datetime.now() - self.timestamp
+        return delta.seconds
+
 
 def Lights(on):
     global _on
@@ -55,6 +66,16 @@ def ReadBluetooth(deviceid):
     return response
 
 
+# gets the freshest device time stamp in seconds
+def GetMinSeconds(arrayOfDevices):
+    minTime = 32000
+    for device in arrayOfDevices:
+        dif = device.SecondsSince()
+        if dif < minTime:
+            minTime = dif
+
+    return minTime
+
 
 # dummy version of ReadBluetooth
 _dummy = datetime.now()
@@ -75,11 +96,13 @@ fastScans = 3
 slowScans = 15
 secondsBetweenScans = fastScans
 secondsDurationOn = 250
-timestamp = datetime.now()
+#timestamp = datetime.now()
 #deviceids = ["C0:63:94:4E:62:F3", "C0:63:94:4E:62:F1"]
-deviceids = ["CD:63:94:4E:62:F3"]
+#deviceids = ["CD:63:94:4E:62:F3"]
 state = False
 _on = False
+
+devices = [Device("CD:63:94:4E:62:F3"), Device("C0:63:94:4E:62:F1")]
 
 
 WriteToDevice(1,0)
@@ -93,14 +116,15 @@ while True:
     #newState = ReadDummy()
 
     #scan for devices
-    for device in deviceids:
+    for device in devices:
         WriteToDevice(3,0)
-        print "scanning for " + device
+        print "scanning for " + device.id
         newState = False
-        deviceState = ReadBluetooth(device)
+        deviceState = ReadBluetooth(device.id)
         if deviceState:
             # if any device found, set for True
-            print "found " + device		
+            print "found " + device.id
+            device.timestamp = datetime.now() #update when it was last seen
             newState = True
             break
 
@@ -109,11 +133,13 @@ while True:
     #has it changed
     if state != newState:
         state = newState
-        timestamp = datetime.now()
+#        timestamp = datetime.now()
+
 
     if state:
-        delta = datetime.now() - timestamp
-        Lights(delta.seconds < secondsDurationOn)
+#        delta = datetime.now() - timestamp
+#        Lights(delta.seconds < secondsDurationOn)
+        Lights(GetMinSeconds(devices)) # use the freshest device found
         secondsBetweenScans = slowScans
     else:
         Lights(False)

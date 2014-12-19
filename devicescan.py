@@ -8,6 +8,7 @@ import math
 import sqlite3
 import random
 import device
+import hardwaredriver
 
 from time import sleep
 from datetime import datetime
@@ -31,9 +32,9 @@ def LoadDevices():
     return devices
 
 
-def UpdateDevice(device):
+def UpdateDevice(device, timestamp):
     con = sqlite3.connect("devices.db", timeout=10)
-    con.execute("update device set lastresponse = ? where id = ?", (datetime.now(), device.id,))
+    con.execute("update device set lastresponse = ? where id = ?", (timestamp, device.id,))
     con.commit()
     con.close()
 
@@ -43,15 +44,24 @@ while True:
     # load the list of devices to scan for
     devices = LoadDevices()
     
-    # scan for each one
-    
-    # update time stamp for each discovered device
-    index = random.randint(0,2)
-    device = devices[index]
-    print device.id
-    UpdateDevice(device)
+    for device in devices:
+        # scan for each one
+        if hardwaredriver.ReadBluetooth(device.address):
+            # update time stamp for each discovered device
+            delta = datetime.now() - device.lastresponse
+            
+            # only update if its been a while since the last time
+            if (delta.seconds() < 230):
+                UpdateDevice(device, datetime.now())
+                print device.id
 
-    sleep(5)
+
+        else:
+            # update time stamp to the past for each undiscovered device
+            UpdateDevice(device, datetime.now() - timedelta(1,10000))
+    
+
+
 
 
 

@@ -23,8 +23,10 @@ def Lights(on):
 
         #write to device
         if _on:
+            print "Turning lights on"
             hardwaredriver.WriteToDevice(1,0)
         else:
+            print "Turning lights off"
             hardwaredriver.WriteToDevice(2,0)
 
     return _on

@@ -70,7 +70,9 @@ while True:
     if not device is None:
         print device.SecondsSince()
         Lights(device.SecondsSince() < secondsDurationOn)
-    
+    else:
+        Lights(False)
+
     sleep(secondsBetweenScans)
 
 

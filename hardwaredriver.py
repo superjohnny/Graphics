@@ -9,6 +9,9 @@ import subprocess
 # 0 turns all off. 1 turns on main. 2 turns off main. 3 turns on red. 4 turns off red. 5 turns on green. 6 turns off green.
 def WriteToDevice(value, retry):
     
+    #dummy, comment out to run properly
+    return
+    
     if retry > 3:
         return
 
@@ -25,6 +28,10 @@ def WriteToDevice(value, retry):
 def ReadBluetooth(deviceid):
     response = False
     
+    #dummy, comment out to run properly
+    return deviceid == "ab:cd" #"ef:gh"
+#    return False
+
     try:
         subprocess.check_output("l2ping " + deviceid + " -c 2 | grep -c 'sent' 2> /dev/null", stderr=subprocess.STDOUT, shell=True)
         response = True

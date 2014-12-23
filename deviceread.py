@@ -35,9 +35,12 @@ def GetMostRecentDevice():
     con = sqlite3.connect("devices.db", detect_types=sqlite3.PARSE_DECLTYPES, timeout=10)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
-    cur.execute("select * from device order by lastresponse desc limit 1")
+    cur.execute("select * from device where status = 1 order by lastresponse desc limit 1")
     row = cur.fetchone()
-    device = Device(row["id"], row["address"], row["lastresponse"])
+    if row is None:
+        return None
+    
+    device = Device(row["id"], row["address"], row["lastresponse"], row["status"])
     con.close()
     return device
 
@@ -62,8 +65,9 @@ while True:
 
     device = GetMostRecentDevice()
     
-    print device.SecondsSince()
-    Lights(device.SecondsSince() < secondsDurationOn)
+    if not device is None:
+        print device.SecondsSince()
+        Lights(device.SecondsSince() < secondsDurationOn)
     
     sleep(secondsBetweenScans)
 

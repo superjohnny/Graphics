@@ -30,7 +30,6 @@ def ReadBluetooth(deviceid):
     
     #dummy, comment out to run properly
 #    return deviceid == "ab:cd"
-    return deviceid == "ef:gh"
 #    return False
 
     try:

@@ -52,8 +52,8 @@ while True:
             if device.status == 0:
                 #update the timestamp and change the state
                 UpdateDevice(device, datetime.now(), 1)
-                print "Updating device state " + device.address
-            
+#                print "Updating device state " + device.address
+
             
             #if the state is the same
             #dont do anything
@@ -71,8 +71,8 @@ while True:
         else:
             # update time stamp to the past for each undiscovered device
             UpdateDevice(device, datetime.now() - timedelta(1,10000), 0)
-            print "Device " + device.address + " not found"
-    
+#            print "Device " + device.address + " not found"
+
 
         sleep(1)
 
